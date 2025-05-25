@@ -1,6 +1,7 @@
 streamlit
 pandas
 numpy
-matplotlib
 xgboost
-scikit-learn
+plotly
+requests
+scipy
