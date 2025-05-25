@@ -57,41 +57,41 @@ def main():
     input_team = st.text_input("模擬球隊縮寫（例：LAL, BOS）", "").upper()
 
     if st.button("開始模擬") and player_name and input_team:
-        player_data = get_player_data(df, player_name)
-        if player_data is None:
-            st.error("❌ 找不到這位球員，請確認拼寫正確。")
-            return
+        with st.spinner("🔄 模擬模型啟動中，請稍候 10～30 秒..."):
+            player_data = get_player_data(df, player_name)
+            if player_data is None:
+                st.error("❌ 找不到這位球員，請確認拼寫正確。")
+                return
 
-        orig_team = player_data["Team"].mode()[0]
-        player_position = player_data["Pos"].mode()[0]
-        orig_team_data = player_data[player_data["Team"] == orig_team]
+            orig_team = player_data["Team"].mode()[0]
+            player_position = player_data["Pos"].mode()[0]
+            orig_team_data = player_data[player_data["Team"] == orig_team]
 
-        st.subheader(f"🎯 {player_name} 在 {orig_team} 的實際數據")
-        st.write(orig_team_data[["Season", "PTS", "AST", "TRB"]])
+            st.subheader(f"🎯 {player_name} 在 {orig_team} 的實際數據")
+            st.write(orig_team_data[["Season", "PTS", "AST", "TRB"]])
 
-        season_years = [int(s.split('-')[0]) for s in orig_team_data["Season"]]
-        experience_list = list(range(1, len(season_years) + 1))
+            season_years = [int(s.split('-')[0]) for s in orig_team_data["Season"]]
+            experience_list = list(range(1, len(season_years) + 1))
 
-        sim_stats = orig_team_data[["Season"]].copy()
-        for stat in ["PTS", "AST", "TRB"]:
-            model = train_stat_model(df, stat, player_position, input_team)
-            sim_stats[stat] = predict_stat(model, season_years, experience_list)
+            sim_stats = orig_team_data[["Season"]].copy()
+            for stat in ["PTS", "AST", "TRB"]:
+                model = train_stat_model(df, stat, player_position, input_team)
+                sim_stats[stat] = predict_stat(model, season_years, experience_list)
 
-        st.subheader(f"🔮 模擬：{player_name} 如果加入 {input_team} 的數據預測")
-        st.write(sim_stats)
+            st.subheader(f"🔮 模擬：{player_name} 如果加入 {input_team} 的數據預測")
+            st.write(sim_stats)
 
-        # 畫圖
-        stats = ["PTS", "AST", "TRB"]
-        for stat in stats:
-            fig, ax = plt.subplots()
-            ax.plot(season_years, orig_team_data[stat], marker='o', label=f"{stat} 實際")
-            ax.plot(season_years, sim_stats[stat], linestyle='--', marker='^', label=f"{stat} 模擬（{input_team}）")
-            ax.set_title(f"{player_name} - {stat} 成長比較")
-            ax.set_xlabel("年份")
-            ax.set_ylabel(stat)
-            ax.legend()
-            ax.grid(True)
-            st.pyplot(fig)
+            stats = ["PTS", "AST", "TRB"]
+            for stat in stats:
+                fig, ax = plt.subplots()
+                ax.plot(season_years, orig_team_data[stat], marker='o', label=f"{stat} 實際")
+                ax.plot(season_years, sim_stats[stat], linestyle='--', marker='^', label=f"{stat} 模擬（{input_team}）")
+                ax.set_title(f"{player_name} - {stat} 成長比較")
+                ax.set_xlabel("年份")
+                ax.set_ylabel(stat)
+                ax.legend()
+                ax.grid(True)
+                st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
