@@ -87,7 +87,7 @@ def predict_stat(model, years, experience_list):
 
 # 主程式
 st.title("🏀 NBA 新秀模擬器")
-st.image(random.choice(cover_images), caption="📸 The Coldest Moment", use_column_width=True)
+st.image(random.choice(cover_images), caption="📸 The Coldest Moment", use_container_width=True)  # 修改此行
 st.markdown("""
 ### 👋 歡迎使用 NBA 新秀模擬器！
 > 本模擬器根據 2004-2023 的 NBA 球員數據，模擬球員若在不同球隊成長的表現（PTS、AST、TRB）。
